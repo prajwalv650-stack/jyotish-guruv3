@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jyotish Guru — Vedic Astrology AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;500;600&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07050E;--bg2:#0D0A1A;--bg3:#131020;
+  --card:#14112A;--card2:#1C1838;
+  --border:#26204A;--border2:#38306A;
+  --gold:#C9A84C;--gold2:#E8D5A3;--gold3:#7A5C18;
+  --purple:#7B5EA7;--purple2:#9B7EC7;--purple3:#4E3080;
+  --teal:#3BBFAD;--teal2:#2A9C8C;
+  --text:#E0D5F5;--text2:#9E90C0;--text3:#584E80;
+  --red:#E05555;--green:#5CB88A;--orange:#E09040;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Crimson Pro',serif;font-size:16px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 55% 45% at 10% 20%,rgba(123,94,167,.12) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 50% at 90% 80%,rgba(59,191,173,.08) 0%,transparent 70%),
+    radial-gradient(ellipse 60% 30% at 50% 0%,rgba(201,168,76,.06) 0%,transparent 55%)}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.stars span{position:absolute;border-radius:50%;background:#fff;animation:twk var(--d,3s) var(--dl,0s) ease-in-out infinite alternate}
+@keyframes twk{0%{opacity:.04;transform:scale(1)}100%{opacity:.55;transform:scale(1.4)}}
+.wrap{max-width:1060px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
+
+/* HEADER */
+.header{text-align:center;padding:3rem 0 2.5rem;margin-bottom:2.5rem;position:relative}
+.header::after{content:'';position:absolute;bottom:0;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2),var(--gold3),var(--border2),transparent)}
+.hstars{display:block;font-size:.95rem;color:var(--gold);letter-spacing:20px;margin-bottom:1.2rem;opacity:.6;animation:glow 4s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.45}50%{opacity:.85}}
+.brand{font-family:'Cinzel Decorative',serif;font-size:2.6rem;font-weight:700;line-height:1.15;
+  background:linear-gradient(130deg,#9A7020,var(--gold),var(--gold2),#B090D8,var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.3rem}
+.brand-by{font-family:'Cinzel',serif;font-size:.7rem;color:var(--gold3);letter-spacing:5px;text-transform:uppercase;margin-bottom:.9rem}
+.tagline{font-size:1.05rem;color:var(--text2);font-style:italic;font-weight:300;letter-spacing:.2px}
+.accuracy-badge{display:inline-flex;align-items:center;gap:.4rem;margin-top:.8rem;padding:.35rem .9rem;
+  background:rgba(59,191,173,.08);border:1px solid rgba(59,191,173,.25);border-radius:20px;
+  font-family:'Cinzel',serif;font-size:.62rem;color:var(--teal);letter-spacing:1px;text-transform:uppercase}
+.accuracy-badge::before{content:'◉';color:var(--teal);font-size:.55rem}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:2rem}
+.tab{flex:1;padding:.72rem .5rem;font-family:'Cinzel',serif;font-size:.75rem;font-weight:500;
+  border:none;background:transparent;cursor:pointer;border-radius:8px;
+  color:var(--text3);letter-spacing:.5px;transition:all .3s;text-align:center}
+.tab.active{background:linear-gradient(135deg,var(--purple3),var(--purple));color:var(--gold2);box-shadow:0 2px 18px rgba(123,94,167,.35)}
+.tab:not(.active):hover{color:var(--text2);background:rgba(255,255,255,.04)}
+.panel{display:none}.panel.active{display:block}
+
+/* FORM */
+.stitle{font-family:'Cinzel',serif;font-size:.8rem;font-weight:500;color:var(--gold);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.4rem;padding-bottom:.6rem;
+  display:flex;align-items:center;gap:.6rem;border-bottom:1px solid var(--border)}
+.stitle::before{content:'◆';color:var(--purple2);font-size:.62rem}
+.fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.fg{display:flex;flex-direction:column;gap:.4rem}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:.68rem;font-weight:500;color:var(--text3);letter-spacing:.9px;text-transform:uppercase;font-family:'Cinzel',serif}
+.fg input,.fg select{padding:.68rem .95rem;border:1px solid var(--border);border-radius:8px;
+  font-family:'Crimson Pro',serif;font-size:1rem;color:var(--text);
+  background:var(--card);transition:border .2s,background .2s;outline:none;
+  -webkit-appearance:none;appearance:none;width:100%}
+.fg input:focus,.fg select:focus{border-color:var(--gold);background:var(--card2)}
+.fg input::placeholder{color:var(--text3);font-style:italic}
+.fg select option{background:var(--bg2);color:var(--text)}
+input[type=date],input[type=time]{color-scheme:dark}
+
+/* Place helper */
+.place-hint{font-size:.72rem;color:var(--text3);margin-top:.3rem;font-style:italic}
+.coord-row{display:flex;gap:.5rem;margin-top:.4rem}
+.coord-row input{font-size:.82rem;padding:.4rem .6rem}
+
+/* BUTTON */
+.btn-row{display:flex;justify-content:center;margin-top:2rem}
+.btn{display:inline-flex;align-items:center;gap:.65rem;padding:.9rem 2.8rem;
+  background:linear-gradient(135deg,var(--purple3),var(--purple),#6848B8);
+  color:var(--gold2);font-family:'Cinzel',serif;font-size:.84rem;font-weight:500;
+  letter-spacing:1.2px;border:1px solid rgba(155,126,199,.35);border-radius:10px;
+  cursor:pointer;transition:all .3s;
+  box-shadow:0 4px 24px rgba(90,60,140,.3),inset 0 1px 0 rgba(255,255,255,.07)}
+.btn:hover{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;
+  box-shadow:0 8px 32px rgba(123,94,167,.5);transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none !important}
+
+/* MATCH */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.5rem}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.3rem}
+.pcard h3{font-family:'Cinzel',serif;font-size:.76rem;color:var(--purple2);letter-spacing:.5px;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.pcard .fg{margin-bottom:.75rem}.pcard .fg:last-child{margin-bottom:0}
+.orn{text-align:center;color:var(--gold3);letter-spacing:10px;font-size:.85rem;margin:1.2rem 0 .3rem;opacity:.5}
+
+/* LOADING */
+.loading{text-align:center;padding:3.5rem 1rem}
+.ring{width:60px;height:60px;margin:0 auto 1.4rem;border-radius:50%;
+  border:2px solid var(--border2);border-top-color:var(--gold);border-right-color:var(--purple2);animation:spin 1.1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{color:var(--text2);font-style:italic;font-size:1.05rem}
+.loading .lsub{font-size:.76rem;color:var(--text3);margin-top:.5rem;letter-spacing:.8px;font-family:'Cinzel',serif;text-transform:uppercase}
+
+/* CHART WHEEL */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+.chart-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem}
+.chart-box h4{font-family:'Cinzel',serif;font-size:.72rem;color:var(--teal);letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid rgba(59,191,173,.2)}
+.planet-table{width:100%;font-size:.9rem;border-collapse:collapse}
+.planet-table tr{border-bottom:1px solid rgba(38,32,74,.5)}
+.planet-table tr:last-child{border-bottom:none}
+.planet-table td{padding:.4rem .5rem;color:#C5BBE0}
+.planet-table td:first-child{color:var(--gold2);font-weight:500;width:100px}
+.planet-table td.house{color:var(--purple2);font-size:.8rem;text-align:right}
+.dasha-bar{background:linear-gradient(90deg,rgba(123,94,167,.15),rgba(59,191,173,.1));
+  border:1px solid var(--border2);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.dasha-title{font-family:'Cinzel',serif;font-size:.7rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem}
+.dasha-main{font-size:1.1rem;color:var(--gold2);font-weight:500}
+.dasha-sub{font-size:.88rem;color:var(--text2);margin-top:.2rem}
+.progress-wrap{height:5px;background:var(--border);border-radius:3px;margin-top:.7rem;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--teal));border-radius:3px;transition:width 1.2s ease}
+.mangal-tag{display:inline-block;padding:.2rem .7rem;border-radius:12px;font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.8px;text-transform:uppercase;margin-top:.5rem}
+.mangal-present{background:rgba(224,85,85,.12);border:1px solid rgba(224,85,85,.3);color:var(--red)}
+.mangal-absent{background:rgba(92,184,138,.08);border:1px solid rgba(92,184,138,.25);color:var(--green)}
+
+/* RESULT */
+.rcard{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,.5);margin-top:1rem}
+.rhdr{background:linear-gradient(135deg,#160C3C,#201650);padding:1.2rem 1.6rem;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:.85rem}
+.rhdr .ico{font-size:1.5rem;color:var(--gold)}
+.rhdr .rt{font-family:'Cinzel',serif;font-size:.9rem;color:var(--gold2);letter-spacing:.5px}
+.rhdr .rs{font-size:.8rem;color:var(--text3);margin-top:.2rem;font-style:italic}
+.rbody{padding:2rem;line-height:1.88;color:var(--text)}
+.rbody h2,.rbody h3{font-family:'Cinzel',serif;font-size:.78rem;color:var(--teal);
+  letter-spacing:1.2px;text-transform:uppercase;margin:1.8rem 0 .7rem;
+  padding-bottom:.45rem;border-bottom:1px solid rgba(59,191,173,.18);
+  display:flex;align-items:center;gap:.5rem}
+.rbody h2:first-child,.rbody h3:first-child{margin-top:0}
+.rbody h2::before,.rbody h3::before{content:'';display:inline-block;width:18px;height:1px;background:var(--teal);opacity:.5;flex-shrink:0}
+.rbody p{margin-bottom:.75rem;color:#C5BBE0;font-size:1.02rem}
+.rbody ul,.rbody ol{padding-left:1.5rem;margin-bottom:.75rem}
+.rbody li{margin-bottom:.45rem;color:#C5BBE0;font-size:1.02rem}
+.rbody strong{color:var(--gold2);font-weight:500}
+.rbody em{color:var(--purple2);font-style:italic}
+.rbody hr{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+.rbody table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.95rem}
+.rbody th{font-family:'Cinzel',serif;font-size:.68rem;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--border)}
+.rbody td{padding:.5rem .7rem;border-bottom:1px solid rgba(38,32,74,.6);color:#C5BBE0}
+.rbody tr:last-child td{border-bottom:none}
+
+/* KOOTA SCORE */
+.score-hero{background:linear-gradient(135deg,#0E0A24,#160E38);border:1px solid var(--border2);border-radius:12px;padding:1.8rem;margin-bottom:2rem;text-align:center}
+.score-label{font-family:'Cinzel',serif;font-size:.72rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:.6rem}
+.score-num{font-family:'Cinzel Decorative',serif;font-size:3.2rem;font-weight:700;line-height:1}
+.score-rating{font-family:'Cinzel',serif;font-size:.95rem;color:var(--purple2);margin:.5rem 0 .3rem;letter-spacing:.5px}
+.score-desc{font-size:.95rem;color:var(--text2);font-style:italic;max-width:420px;margin:0 auto}
+.score-bar-wrap{height:6px;background:var(--border);border-radius:3px;margin:1rem auto 0;max-width:280px;overflow:hidden}
+.score-bar{height:100%;border-radius:3px;transition:width 1s}
+
+.koota-table{width:100%;border-collapse:collapse;margin:.5rem 0 1.5rem;font-size:.95rem}
+.koota-table th{font-family:'Cinzel',serif;font-size:.68rem;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;text-align:left;padding:.6rem .7rem;border-bottom:1px solid var(--border2)}
+.koota-table td{padding:.55rem .7rem;border-bottom:1px solid rgba(38,32,74,.6)}
+.k-bar{height:4px;background:var(--border);border-radius:3px;margin-top:4px;width:60px}
+.k-fill{height:100%;border-radius:3px}
+
+/* ERROR */
+.ebox{background:rgba(224,85,85,.07);border:1px solid rgba(224,85,85,.22);border-radius:10px;padding:1.3rem 1.6rem;color:#F0A0A0;font-size:.97rem;line-height:1.75;margin-top:1.5rem}
+.ebox strong{color:var(--red)}
+
+/* FOOTER */
+.footer{text-align:center;padding:2.5rem 0 1.5rem;margin-top:3.5rem;position:relative}
+.footer::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent)}
+.footer p{font-size:.76rem;color:var(--text3);letter-spacing:.5px;font-family:'Cinzel',serif}
+.footer .g{color:var(--gold3)}
+
+@media(max-width:680px){
+  .fg-grid,.g3,.two-col,.chart-grid{grid-template-columns:1fr}
+  .brand{font-size:1.65rem}
+  .tabs{flex-direction:column}
+  .rbody{padding:1.2rem}
+}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="wrap">
+
+  <div class="header">
+    <span class="hstars">☽ ✦ ☉ ✦ ☾</span>
+    <div class="brand">Jyotish Guru</div>
+    <div class="brand-by">by Deoxys</div>
+    <p class="tagline">Vedic Birth Chart &nbsp;·&nbsp; Kundali Matching &nbsp;·&nbsp; Dasha Predictions</p>
+    <div class="accuracy-badge">Swiss Ephemeris · Lahiri Ayanamsa · Claude AI</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('single')">🪐 Birth Chart &amp; Predictions</button>
+    <button class="tab" onclick="switchTab('match')">💫 Kundali Matching</button>
+  </div>
+
+  <!-- SINGLE CHART PANEL -->
+  <div id="panel-single" class="panel active">
+    <div class="stitle">Birth Details</div>
+    <div class="fg-grid g3">
+      <div class="fg">
+        <label>Full Name (Optional)</label>
+        <input type="text" id="name1" placeholder="e.g. Arjun Sharma"/>
+      </div>
+      <div class="fg">
+        <label>Date of Birth ✦</label>
+        <input type="date" id="dob1"/>
+      </div>
+      <div class="fg">
+        <label>Time of Birth ✦</label>
+        <input type="time" id="tob1"/>
+      </div>
+    </div>
+    <div class="fg-grid">
+      <div class="fg full">
+        <label>Place of Birth ✦</label>
+        <input type="text" id="pob1" placeholder="e.g. Mumbai, India"/>
+        <div class="place-hint">For maximum accuracy, also enter coordinates below.</div>
+      </div>
+    </div>
+    <div class="fg-grid g3" style="margin-top:.3rem">
+      <div class="fg">
+        <label>Latitude (decimal)</label>
+        <input type="number" id="lat1" placeholder="e.g. 19.0760" step="0.0001"/>
+      </div>
+      <div class="fg">
+        <label>Longitude (decimal)</label>
+        <input type="number" id="lon1" placeholder="e.g. 72.8777" step="0.0001"/>
+      </div>
+      <div class="fg" style="justify-content:flex-end;padding-top:1.4rem">
+        <button class="btn" style="padding:.55rem 1.2rem;font-size:.7rem" onclick="geolocate('lat1','lon1','pob1')">📍 Use My Location</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btnS" onclick="genKundali()">☉ &nbsp; Reveal My Kundali</button>
+    </div>
+    <div id="out-single"></div>
+  </div>
+
+  <!-- MATCH PANEL -->
+  <div id="panel-match" class="panel">
+    <div class="stitle">Person 1 — Birth Details</div>
+    <div class="fg-grid g3">
+      <div class="fg">
+        <label>Name</label>
+        <input type="text" id="mn1" placeholder="e.g. Priya"/>
+      </div>
+      <div class="fg">
+        <label>Date of Birth ✦</label>
+        <input type="date" id="md1"/>
+      </div>
+      <div class="fg">
+        <label>Time of Birth ✦</label>
+        <input type="time" id="mt1"/>
+      </div>
+    </div>
+    <div class="fg-grid g3" style="margin-top:.5rem">
+      <div class="fg">
+        <label>Place of Birth</label>
+        <input type="text" id="mp1" placeholder="e.g. Delhi, India"/>
+      </div>
+      <div class="fg">
+        <label>Latitude</label>
+        <input type="number" id="mlat1" placeholder="28.6139" step="0.0001"/>
+      </div>
+      <div class="fg">
+        <label>Longitude</label>
+        <input type="number" id="mlon1" placeholder="77.2090" step="0.0001"/>
+      </div>
+    </div>
+
+    <div class="orn">✦ ✦ ✦</div>
+    <div class="stitle">Person 2 — Birth Details</div>
+    <div class="fg-grid g3">
+      <div class="fg">
+        <label>Name</label>
+        <input type="text" id="mn2" placeholder="e.g. Rahul"/>
+      </div>
+      <div class="fg">
+        <label>Date of Birth ✦</label>
+        <input type="date" id="md2"/>
+      </div>
+      <div class="fg">
+        <label>Time of Birth ✦</label>
+        <input type="time" id="mt2"/>
+      </div>
+    </div>
+    <div class="fg-grid g3" style="margin-top:.5rem">
+      <div class="fg">
+        <label>Place of Birth</label>
+        <input type="text" id="mp2" placeholder="e.g. Bengaluru, India"/>
+      </div>
+      <div class="fg">
+        <label>Latitude</label>
+        <input type="number" id="mlat2" placeholder="12.9716" step="0.0001"/>
+      </div>
+      <div class="fg">
+        <label>Longitude</label>
+        <input type="number" id="mlon2" placeholder="77.5946" step="0.0001"/>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btnM" onclick="genMatch()">☽ &nbsp; Compute Compatibility</button>
+    </div>
+    <div id="out-match"></div>
+  </div>
+
+  <div class="footer">
+    <p>Jyotish Guru <span class="g">✦</span> by Deoxys <span class="g">✦</span> Swiss Ephemeris · Claude AI</p>
+    <p style="margin-top:.45rem;font-size:.68rem">Astronomical precision · For spiritual guidance · Consult a certified Jyotishi for major life decisions</p>
+  </div>
+</div>
+
+<script>
+// ── STARS ──
+(()=>{
+  const c=document.getElementById('stars');
+  for(let i=0;i<160;i++){
+    const s=document.createElement('span');
+    const sz=Math.random()*2.5+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*5}s;--dl:${Math.random()*5}s`;
+    c.appendChild(s);
+  }
+})();
+
+// ── HELPERS ──
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['single','match'][i]===t));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+}
+
+function fmtDate(d){
+  if(!d)return'';
+  const dt=new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+}
+
+function showLoading(el, msg='Calculating planetary positions…', sub='Swiss Ephemeris · Lahiri Ayanamsa · Claude AI'){
+  el.innerHTML=`<div class="loading"><div class="ring"></div><p>${msg}</p><div class="lsub">${sub}</div></div>`;
+}
+
+function showError(el, msg){
+  el.innerHTML=`<div class="ebox"><strong>Error</strong><br/>${msg}</div>`;
+}
+
+async function geolocate(latId, lonId, pobId){
+  if(!navigator.geolocation){alert('Geolocation not supported');return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById(latId).value=pos.coords.latitude.toFixed(4);
+    document.getElementById(lonId).value=pos.coords.longitude.toFixed(4);
+    // Reverse geocode via public API
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`)
+      .then(r=>r.json()).then(d=>{
+        if(d.address){
+          const city=d.address.city||d.address.town||d.address.village||'';
+          const country=d.address.country||'';
+          document.getElementById(pobId).value=`${city}, ${country}`;
+        }
+      }).catch(()=>{});
+  }, ()=>alert('Could not get location'));
+}
+
+// Lookup common Indian city coordinates
+const CITY_COORDS = {
+  'mumbai':[19.0760,72.8777],'delhi':[28.6139,77.2090],'new delhi':[28.6139,77.2090],
+  'bangalore':[12.9716,77.5946],'bengaluru':[12.9716,77.5946],'chennai':[13.0827,80.2707],
+  'kolkata':[22.5726,88.3639],'hyderabad':[17.3850,78.4867],'pune':[18.5204,73.8567],
+  'ahmedabad':[23.0225,72.5714],'jaipur':[26.9124,75.7873],'surat':[21.1702,72.8311],
+  'lucknow':[26.8467,80.9462],'kanpur':[26.4499,80.3319],'patna':[25.5941,85.1376],
+  'bhopal':[23.2599,77.4126],'nagpur':[21.1458,79.0882],'indore':[22.7196,75.8577],
+  'london':[51.5074,-0.1278],'new york':[40.7128,-74.0060],'dubai':[25.2048,55.2708],
+  'singapore':[1.3521,103.8198],'toronto':[43.6532,-79.3832],'sydney':[-33.8688,151.2093],
+  'kathmandu':[27.7172,85.3240]
+};
+
+function tryAutofillCoords(placeId, latId, lonId){
+  const pob=document.getElementById(placeId).value.trim().toLowerCase();
+  if(!pob) return;
+  // Try exact or partial match
+  for(const [key,coords] of Object.entries(CITY_COORDS)){
+    if(pob.includes(key)){
+      if(!document.getElementById(latId).value)
+        document.getElementById(latId).value=coords[0];
+      if(!document.getElementById(lonId).value)
+        document.getElementById(lonId).value=coords[1];
+      break;
+    }
+  }
+}
+
+// ── MARKDOWN RENDERER ──
+function md2html(t){
+  return t
+    .replace(/^###\s+(.+)$/gm,'<h3>$1</h3>')
+    .replace(/^##\s+(.+)$/gm,'<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^---$/gm,'<hr/>')
+    .replace(/^\s*[-•]\s+(.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>')
+    .replace(/\n{2,}/g,'</p><p>')
+    .replace(/^(?!<[hul]|<hr|<p)(.+)$/gm,'<p>$1</p>')
+    .replace(/<p>\s*<\/p>/g,'');
+}
+
+// ── PLANET TABLE ──
+function buildPlanetTable(planets, lagna){
+  if(!planets) return '';
+  const order=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
+  const sym={'Sun':'☉','Moon':'☽','Mars':'♂','Mercury':'☿','Jupiter':'♃','Venus':'♀','Saturn':'♄','Rahu':'☊','Ketu':'☋'};
+  let rows='';
+  order.forEach(name=>{
+    const p=planets[name];
+    if(!p||p.error) return;
+    rows+=`<tr>
+      <td>${sym[name]||''} ${name}</td>
+      <td>${p.sign} ${p.degree?.toFixed(1)||''}°</td>
+      <td>${p.nakshatra||''}</td>
+      <td class="house">H${p.house||'?'}</td>
+    </tr>`;
+  });
+  return `<table class="planet-table">
+    <tr><td style="color:var(--teal);font-weight:500">☆ Lagna</td>
+        <td>${lagna?.sign||''} ${lagna?.degree?.toFixed(1)||''}°</td><td>—</td><td></td></tr>
+    ${rows}
+  </table>`;
+}
+
+// ── DASHA DISPLAY ──
+function buildDashaDisplay(dasha){
+  if(!dasha) return '';
+  const pct=Math.min(100,Math.round((dasha.years_into_mahadasha/(dasha.years_into_mahadasha+dasha.years_remaining_mahadasha))*100));
+  const seq=(dasha.sequence||[]).map(d=>`<span style="color:var(--text3);font-size:.82rem">${d.lord}</span>`).join(' → ');
+  return `<div class="dasha-bar">
+    <div class="dasha-title">Vimshottari Dasha</div>
+    <div class="dasha-main">${dasha.mahadasha} Mahadasha / ${dasha.antardasha} Antardasha</div>
+    <div class="dasha-sub">${dasha.years_remaining_mahadasha?.toFixed(1)} years remaining in ${dasha.mahadasha} period</div>
+    <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div style="margin-top:.6rem;font-size:.76rem;color:var(--text3);font-family:'Cinzel',serif;letter-spacing:.5px">
+      Upcoming: ${seq}
+    </div>
+  </div>`;
+}
+
+// ── GENERATE KUNDALI ──
+async function genKundali(){
+  tryAutofillCoords('pob1','lat1','lon1');
+  const dob=document.getElementById('dob1').value;
+  const tob=document.getElementById('tob1').value;
+  if(!dob||!tob){alert('Please enter Date and Time of Birth.');return;}
+
+  const btn=document.getElementById('btnS');
+  btn.disabled=true;
+  const out=document.getElementById('out-single');
+  showLoading(out,'Computing chart via Swiss Ephemeris…','Lahiri Ayanamsa · Real planetary positions');
+
+  const payload={
+    name: document.getElementById('name1').value.trim()||'the native',
+    dob, tob,
+    pob: document.getElementById('pob1').value.trim(),
+    lat: parseFloat(document.getElementById('lat1').value)||12.9716,
+    lon: parseFloat(document.getElementById('lon1').value)||77.5946,
+  };
+
+  try{
+    const res=await fetch('/api/kundali',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(data.error) throw new Error(data.error);
+
+    const name=payload.name;
+    const chart=data.chart||{};
+    const md=chart.mangal_dosha;
+    const atk=chart.atmakaraka||'';
+    const ephem=chart.ephemeris||'';
+
+    let chartSection='';
+    if(chart.planets){
+      chartSection=`<div class="chart-grid">
+        <div class="chart-box">
+          <h4>🪐 Planetary Positions</h4>
+          ${buildPlanetTable(chart.planets, chart.lagna)}
+          <div style="margin-top:.7rem;font-size:.75rem;color:var(--teal);font-family:'Cinzel',serif">
+            ${ephem} · Atmakaraka: ${atk}
+          </div>
+          <div style="margin-top:.4rem">
+            <span class="mangal-tag ${md?'mangal-present':'mangal-absent'}">
+              ${md?'⚠ Mangal Dosha':'✓ No Mangal Dosha'}
+            </span>
+          </div>
+        </div>
+        <div class="chart-box">
+          <h4>⏳ Dasha Sequence</h4>
+          ${buildDashaDisplay(chart.dasha)}
+          <div style="margin-top:.8rem">
+            <div style="font-family:'Cinzel',serif;font-size:.68rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem">Moon Nakshatra</div>
+            <div style="font-size:1.05rem;color:var(--gold2)">${chart.moon_nakshatra||''} Pada ${chart.moon_pada||''}</div>
+            <div style="font-size:.88rem;color:var(--text2)">${chart.moon_rashi||''} · Lord: ${chart.moon_nakshatra_lord||''}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    out.innerHTML=`<div class="rcard">
+      <div class="rhdr">
+        <div class="ico">☉</div>
+        <div>
+          <div class="rt">Kundali Report — ${name}</div>
+          <div class="rs">${fmtDate(dob)} · ${tob} · ${payload.pob||''}</div>
+        </div>
+      </div>
+      <div class="rbody">
+        ${chartSection}
+        ${md2html(data.result||'')}
+      </div>
+    </div>`;
+  }catch(e){
+    showError(out, e.message||'Unknown error. Please try again.');
+  }
+  btn.disabled=false;
+}
+
+// ── KOOTA TABLE ──
+function buildKootaTable(koota){
+  const names={
+    varna:['Varna','Spiritual & social harmony','#7B5EA7'],
+    vashya:['Vashya','Mutual attraction & control','#9B7EC7'],
+    tara:['Tara','Birth star compatibility','#C9A84C'],
+    yoni:['Yoni','Physical & intimate harmony','#E8D5A3'],
+    grahaMaitri:['Graha Maitri','Mental & intellectual bond','#3BBFAD'],
+    gana:['Gana','Temperament compatibility','#5CB88A'],
+    bhakoot:['Bhakoot','Emotional & financial harmony','#7B5EA7'],
+    nadi:['Nadi','Health of progeny','#E09040'],
+  };
+  const rows=Object.entries(koota).map(([k,v])=>{
+    const [label,desc,color]=names[k]||[k,'','#fff'];
+    const pct=Math.round(v.score/v.max*100);
+    const c=pct>=70?'#5CB88A':pct>=40?'#C9A84C':'#E05555';
+    return `<tr>
+      <td><strong style="color:var(--gold2)">${label}</strong><br/><span style="font-size:.8rem;color:var(--text3)">${desc}</span></td>
+      <td style="color:var(--text2);font-size:.88rem">${v.detail}</td>
+      <td style="text-align:center">
+        <span style="font-family:'Cinzel',serif;font-weight:600;color:${c}">${v.score}/${v.max}</span>
+        <div class="k-bar"><div class="k-fill" style="width:${pct}%;background:${c}"></div></div>
+      </td>
+    </tr>`;
+  }).join('');
+  return `<div style="overflow-x:auto"><table class="koota-table">
+    <thead><tr>
+      <th>Koota</th><th>Details</th><th>Score</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+// ── GENERATE MATCH ──
+async function genMatch(){
+  const dob1=document.getElementById('md1').value, tob1=document.getElementById('mt1').value;
+  const dob2=document.getElementById('md2').value, tob2=document.getElementById('mt2').value;
+  if(!dob1||!tob1||!dob2||!tob2){alert('Please enter Date and Time of Birth for both persons.');return;}
+  tryAutofillCoords('mp1','mlat1','mlon1');
+  tryAutofillCoords('mp2','mlat2','mlon2');
+
+  const btn=document.getElementById('btnM');
+  btn.disabled=true;
+  const out=document.getElementById('out-match');
+  showLoading(out,'Computing both charts & Ashta-Koota…','Swiss Ephemeris · Traditional Lookup Tables · Claude AI');
+
+  const payload={
+    n1: document.getElementById('mn1').value.trim()||'Person 1',
+    dob1, tob1, pob1: document.getElementById('mp1').value.trim(),
+    lat1: parseFloat(document.getElementById('mlat1').value)||12.9716,
+    lon1: parseFloat(document.getElementById('mlon1').value)||77.5946,
+    n2: document.getElementById('mn2').value.trim()||'Person 2',
+    dob2, tob2, pob2: document.getElementById('mp2').value.trim(),
+    lat2: parseFloat(document.getElementById('mlat2').value)||12.9716,
+    lon2: parseFloat(document.getElementById('mlon2').value)||77.5946,
+  };
+
+  try{
+    const res=await fetch('/api/match',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(data.error) throw new Error(data.error);
+
+    const {koota,total,chart1,chart2}=data;
+    const rating=total>=32?'Exceptional ⭐⭐⭐⭐⭐':total>=28?'Very Good ⭐⭐⭐⭐':total>=24?'Good ⭐⭐⭐':total>=18?'Average ⭐⭐':'Needs Attention ⭐';
+    const ratingDesc=total>=32?'Exceptional harmony across all dimensions of compatibility.':
+      total>=28?'Strong, well-rounded union with solid foundations.':
+      total>=24?'Good compatibility with manageable challenges.':
+      total>=18?'Average — thrives with mutual understanding and effort.':
+      'Significant challenges; awareness and remedies are important.';
+    const totalColor=total>=28?'#5CB88A':total>=18?'#C9A84C':'#E05555';
+
+    out.innerHTML=`<div class="rcard">
+      <div class="rhdr">
+        <div class="ico">☽</div>
+        <div>
+          <div class="rt">Kundali Matching — ${payload.n1} &amp; ${payload.n2}</div>
+          <div class="rs">${fmtDate(dob1)} · ${fmtDate(dob2)}</div>
+        </div>
+      </div>
+      <div class="rbody">
+
+        <div class="score-hero">
+          <div class="score-label">Ashta-Koota Total Score</div>
+          <div class="score-num" style="color:${totalColor}">${total}<span style="font-size:1.4rem;color:var(--text3)">/36</span></div>
+          <div class="score-rating">${rating}</div>
+          <div class="score-desc">${ratingDesc}</div>
+          <div class="score-bar-wrap">
+            <div class="score-bar" style="width:${Math.round(total/36*100)}%;background:linear-gradient(90deg,var(--purple),${totalColor})"></div>
+          </div>
+        </div>
+
+        <h3>Ashta-Koota Breakdown</h3>
+        ${buildKootaTable(koota)}
+
+        ${(()=>{
+          // Mini chart comparison
+          const c1=chart1||{}, c2=chart2||{};
+          if(!c1.dasha) return '';
+          return `<div class="chart-grid" style="margin-bottom:1.5rem">
+            <div class="chart-box">
+              <h4>🌙 ${payload.n1} — Chart Overview</h4>
+              <div style="margin-bottom:.6rem">
+                <span style="color:var(--gold2)">${c1.moon_nakshatra||''}</span> Nakshatra Pada ${c1.moon_pada||''}<br/>
+                <span style="font-size:.88rem;color:var(--text2)">Moon in ${c1.moon_rashi||''} · Lagna: ${c1.lagna?.sign||''}</span><br/>
+                <span class="mangal-tag ${c1.mangal_dosha?'mangal-present':'mangal-absent'}" style="margin-top:.4rem">
+                  ${c1.mangal_dosha?'⚠ Mangal Dosha':'✓ No Mangal Dosha'}
+                </span>
+              </div>
+              ${buildDashaDisplay(c1.dasha)}
+            </div>
+            <div class="chart-box">
+              <h4>🌙 ${payload.n2} — Chart Overview</h4>
+              <div style="margin-bottom:.6rem">
+                <span style="color:var(--gold2)">${c2.moon_nakshatra||''}</span> Nakshatra Pada ${c2.moon_pada||''}<br/>
+                <span style="font-size:.88rem;color:var(--text2)">Moon in ${c2.moon_rashi||''} · Lagna: ${c2.lagna?.sign||''}</span><br/>
+                <span class="mangal-tag ${c2.mangal_dosha?'mangal-present':'mangal-absent'}" style="margin-top:.4rem">
+                  ${c2.mangal_dosha?'⚠ Mangal Dosha':'✓ No Mangal Dosha'}
+                </span>
+              </div>
+              ${buildDashaDisplay(c2.dasha)}
+            </div>
+          </div>`;
+        })()}
+
+        ${md2html(data.result||'')}
+      </div>
+    </div>`;
+  }catch(e){
+    showError(out, e.message||'Unknown error. Please try again.');
+  }
+  btn.disabled=false;
+}
+</script>
+</body>
+</html>
